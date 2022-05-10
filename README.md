@@ -73,7 +73,7 @@ source /opt/ros/noetic/setup.bash
 ```
 mkdir ~/catkin_vins/src
 cd ~/catkin_vins/src
-git clone https://github.com/rkuo/VINS-Fusion.git
+git clone git@github.com:AlienPa/VINS-Fusion.git
 cd ../
 catkin build
 source ~/catkin_vins/src

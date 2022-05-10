@@ -1,5 +1,5 @@
-# [VINS-Fusion](https://github.com/HKUST-Aerial-Robotics/VINS-Fusion) branch for OpenCV 4.2.0
-**[A General Optimization-based Framework for Local Odometry Estimation with Multiple Sensors](https://arxiv.org/pdf/1901.03638.pdf)**
+# [VINS-Fusion](https://github.com/HKUST-Aerial-Robotics/VINS-Fusion) branch for OpenCV 4.2.0 + Eigen 3.3.9 + Ceres 2.0.0 
+**[A General Optimization-based Framework for Local Odometry Estimation with Multiple Sensors (PDF)](https://arxiv.org/pdf/1901.03638.pdf)**
 
 ## Modifications:
 1. all CMakeFiles.txt: set(CMAKE_CXX_FLAGS "-std=c++14")
@@ -22,23 +22,31 @@
 
 ## 1. Prerequisites
 ### Ubuntu 20.04.4-LTS
+* Eigen 3.3.9
+* Ceres 2.0.0
 * Python 3.8.10
 * OpenCV 4.2.0
 
-### ROS1 installation
+### [ROS1 Noetic installation](http://wiki.ros.org/noetic/Installation/Ubuntu)
 ```
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+sudo apt install curl # if you haven't already installed curl
+curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
 sudo apt-get update
-export ROS1_DISTRO=noetic # kinetic=16.04, melodic=18.04, noetic=20.04
-sudo apt-get install ros-$ROS1_DISTRO-desktop-full
+sudo apt-get install ros-noetic-desktop-full
 sudo apt-get install python3-catkin-tools python3-osrf-pycommon # ubuntu 20.04
 sudo apt-get install libeigen3-dev libboost-all-dev libceres-dev
-```
-```
-echo "alias source_ros1=\"source /opt/ros/$ROS1_DISTRO/setup.bash\"" >> ~/.bashrc
-echo "alias source_devel=\"source devel/setup.bash\"" >> ~/.bashrc
+echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
 source ~/.bashrc
+```
+### [Eigen](https://eigen.tuxfamily.org/index.php?title=Main_Page)
+```
+wget https://gitlab.com/libeigen/eigen/-/archive/3.3.9/eigen-3.3.9.tar.gz
+tar zxf eigen-3.3.9.tar.gz
+cd eigen-3.3.9 && mkdir build && cd build
+cmake ..
+make -j6
+sudo make install
 ```
 
 ### [Ceres Solver installation](http://ceres-solver.org/installation.html)
@@ -48,39 +56,31 @@ sudo apt-get install libgoogle-glog-dev libgflags-dev
 sudo apt-get install libatlas-base-dev
 sudo apt-get install libeigen3-dev
 sudo apt-get install libsuitesparse-dev
-```
-```
-wget http://ceres-solver.org/ceres-solver-2.1.0.tar.gz
-tar zxf ceres-solver-2.1.0.tar.gz
+
+wget http://ceres-solver.org/ceres-solver-2.0.0.tar.gz
+tar zxf ceres-solver-2.0.0.tar.gz
 mkdir ceres-bin
 cd ceres-bin
-cmake ../ceres-solver-2.1.0
-make -j4
+cmake ../ceres-solver-2.0.0
+make -j6
 make install
 ```
 ## 2. Build on ROS
 ```
 sudo apt install metis
-source_ros1
+source /opt/ros/noetic/setup.bash
 ```
 ```
-make -p ~/catkin_vins/src
+mkdir ~/catkin_vins/src
 cd ~/catkin_vins/src
 git clone https://github.com/rkuo/VINS-Fusion.git
 cd ../
 catkin build
+source ~/catkin_vins/src
 source devel/setup.bash
 ```
 
-## 3. Exercises:
-### VI-Car
-* Download [car bag](https://drive.google.com/open?id=10t9H1u8pMGDOI6Q2w2uezEq5Ib-Z8tLz) to ~/datasets/vi_car.
-1. `roslaunch vins vins_rviz.launch`
-2. `rosrun vins vins_node ~/catkin_vins/src/VINS-Fusion/config/vi_car/vi_car.yaml`
-3. (optional) `rosrun loop_fusion loop_fusion_node ~/catkin_vins/src/VINS-Fusion/config/vi_car/vi_car.yaml`
-4. `rosbag play ~/datasets/vi_car/car.bag`
-![](https://github.com/rkuo2000/Robotics/blob/gh-pages/images/VINS-Fusion_VI_Car.png?raw=true)
-
+## 3. Demo:
 ### EuRoC-MAV
 **MH_01_easy** (Monocualr camera + IMU)
 1. `roslaunch vins vins_rviz.launch`
